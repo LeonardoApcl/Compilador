@@ -1,0 +1,8 @@
+program CasosEspeciais;
+var x:integer; # Sem espaços entre os tokens #
+begin
+  # O comentário abaixo não é fechado, deve gerar um aviso #
+  x:=10;
+  if x>5 then write"maior";
+end
+# Comentário sem fim de arquivo

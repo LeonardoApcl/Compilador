@@ -1,0 +1,11 @@
+program ExemploSimples;
+
+var
+  idade: integer;
+  salario: real;
+
+begin
+  idade := 25;
+  salario := 1500.50;
+  write "Ola Mundo";
+end

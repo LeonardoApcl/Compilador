@@ -1,0 +1,25 @@
+program TesteCompleto;
+
+const
+  PI := 3.14;
+  MAX_VALOR := 100;
+
+var
+  contador: integer;
+  resultado: real;
+
+begin
+  contador := 0;
+  resultado := 0.0;
+  
+  while contador < MAX_VALOR
+  begin
+    resultado := resultado + PI;
+    contador := contador + 1;
+  end;
+
+  if resultado > 300 then
+    write "Resultado alto"
+  else
+    write "Resultado baixo";
+end

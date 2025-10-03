@@ -1,0 +1,10 @@
+program TesteComErros;
+
+var
+  correto: integer;
+  invalido$: real; # O '$' não é válido em um ID #
+
+begin
+  correto := 10;
+  @ # O símbolo '@' não pertence à linguagem #
+end

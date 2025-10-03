@@ -1,0 +1,13 @@
+program TesteDeComentarios;
+
+# Este é um comentário que
+  ocupa múltiplas linhas.
+  Nenhuma parte dele deve virar um token. #
+
+var
+  valor: integer; # Comentário na mesma linha da declaração #
+
+begin
+  valor := 123; # Atribuição com comentário ao lado #
+end
+# Fim do programa. #
