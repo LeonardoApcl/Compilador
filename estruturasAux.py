@@ -1,3 +1,5 @@
+from anytree import Node, RenderTree
+
 class Token:
     def __init__(self, lexema, token, linha):
         self.lexema = lexema
@@ -76,3 +78,38 @@ class NoArvore:
         for filho in self.filhos:
             ret += filho.__str__(nivel + 1)
         return ret
+    
+def visualizar_com_anytree(raiz_original):
+    """
+    Converte a árvore sintática (NoArvore) para uma árvore no formato da
+    biblioteca anytree e a imprime no console.
+    """
+    if not raiz_original:
+        print("Árvore está vazia.")
+        return
+
+    def _converter_arvore(no_original, parent=None):
+        """
+        Função recursiva que converte a estrutura NoArvore para anytree.Node.
+        """
+        # Formata o rótulo do nó
+        if isinstance(no_original.valor, Token):
+            label = f"{no_original.valor.token} ({no_original.valor.lexema})"
+        else:
+            label = str(no_original.valor)
+        
+        # Cria o nó no formato do anytree, especificando o pai
+        novo_no = Node(label, parent=parent)
+
+        # Chama recursivamente para os filhos
+        for filho in no_original.filhos:
+            _converter_arvore(filho, parent=novo_no)
+        
+        return novo_no
+
+    # Inicia a conversão a partir da raiz
+    raiz_anytree = _converter_arvore(raiz_original)
+
+    # Usa o RenderTree para imprimir a árvore de forma bonita
+    for pre, fill, node in RenderTree(raiz_anytree):
+        print(f"{pre}{node.name}")

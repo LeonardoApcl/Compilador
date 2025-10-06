@@ -1,6 +1,6 @@
 program TesteDeComandos;
 const
-  valor := "45Amanha e outro dia 89";
+  valor := "45Amanha e outro dia 89"
 begin
 
 end

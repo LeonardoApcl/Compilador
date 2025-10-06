@@ -148,7 +148,6 @@ class Sintatico:
         
         return no
 
-
     def declaracoes(self):
         # [DECLARACOES] -> [DEF_CONST] [DEF_TIPOS] [DEF_VAR] [LISTA_FUNC] | Є
 
@@ -178,6 +177,11 @@ class Sintatico:
     
     def lista_const(self):
         """
+        Esse método não é exatamente como na gramática, foi percebido durante a implementação que
+        a forma sem o (;) leva a uma recursão (ou loop) infinito, de certa forma uma recursão a esquerda
+        indireta. Para evitar este problema o (;) foi retirado da gramática de constante e usado como
+        separador da lista de constantes (semelhante a lista de tipos).
+
         Processa [LISTA_CONST] -> [CONSTANTE] [LISTA_CONST']
         e [LISTA_CONST'] -> (;) [LISTA_CONST] | Є de forma iterativa.
         """
@@ -192,14 +196,13 @@ class Sintatico:
         return no
     
     def constante(self):
-        # [CONSTANTE] -> [ID] (:=) [CONST_VALOR] (;)
+        # [CONSTANTE] -> [ID] (:=) [CONST_VALOR]
 
         no = NoArvore('CONSTANTE')
         
         no.adicionar_filho(self.processarTerminal('ID'))
         no.adicionar_filho(self.processarTerminal('Atribuicao'))
         no.adicionar_filho(self.const_valor())
-        no.adicionar_filho(self.processarTerminal('PontV'))
         
         return no
     
@@ -242,6 +245,113 @@ class Sintatico:
         if token_type == 'Type':
             no.adicionar_filho(self.processarTerminal('Type'))
             no.adicionar_filho(self.lista_tipos())
+        
+        return no
+    
+    def lista_tipos(self):
+        """
+        Processa [LISTA_TIPOS] -> [TIPO] [LISTA_TIPOS’]
+        e [LISTA_TIPOS'] -> (;) [LISTA_TIPOS] | Є de forma iterativa.
+        """
+        no = NoArvore('LISTA_TIPOS')
+
+        no.adicionar_filho(self.tipo())
+
+        while self.token_atual and self.token_atual.dado.token == 'PontV':
+            no.adicionar_filho(self.processarTerminal('PontV'))
+            no.adicionar_filho(self.tipo())
+        
+        return no
+    
+    def tipo(self):
+        # [TIPO] -> [ID] (:=) [TIPO_DADO]
+
+        no = NoArvore('TIPO')
+        
+        no.adicionar_filho(self.processarTerminal('ID'))
+        no.adicionar_filho(self.processarTerminal('Atribuicao'))
+        no.adicionar_filho(self.tipo_dado())
+        
+        return no
+    
+    def tipo_dado(self):
+        # [TIPO_DADO] -> (integer) | (real) | (array) ([) [NUMERO] (]) (of) [TIPO_DADO] | (record) [LISTA_VAR] (end) | [ID]
+
+        no = NoArvore('TIPO_DADO')
+        token_type = self.token_atual.dado.token if self.token_atual else None
+        
+        if token_type == 'TipoSimples': 
+            no.adicionar_filho(self.processarTerminal('TipoSimples'))
+        
+        elif token_type == 'Array':
+            no.adicionar_filho(self.processarTerminal('Array'))
+            no.adicionar_filho(self.processarTerminal('AColch'))
+            no.adicionar_filho(self.processarTerminal('Num'))
+            no.adicionar_filho(self.processarTerminal('FColch'))
+            no.adicionar_filho(self.processarTerminal('Of'))
+            no.adicionar_filho(self.tipo_dado())
+
+        elif token_type == 'Record': 
+            no.adicionar_filho(self.processarTerminal('Record'))
+            no.adicionar_filho(self.lista_var())
+            no.adicionar_filho(self.processarTerminal('End'))
+
+        elif token_type == 'ID': 
+            no.adicionar_filho(self.processarTerminal('ID'))
+
+        else:
+            self.erro(f"um tipo simples, 'array', 'record' ou ID")
+
+    def def_var(self):
+        # [DEF_VAR] -> (var) [LISTA_VAR] | Є
+
+        no = NoArvore('DEF_VAR')
+        token_type = self.token_atual.dado.token if self.token_atual else None
+
+        if token_type == 'Var':
+            no.adicionar_filho(self.processarTerminal('Var'))
+            no.adicionar_filho(self.lista_var())
+        
+        return no
+    
+    def lista_var(self):
+        """
+        Processa [LISTA_VAR] -> [VARIAVEL] [LISTA_VAR’]
+        e [LISTA_VAR’] -> (;) [LISTA_VAR] | Є de forma iterativa.
+        """
+        no = NoArvore('LISTA_VAR')
+
+        no.adicionar_filho(self.variavel())
+
+        while self.token_atual and self.token_atual.dado.token == 'PontV':
+            no.adicionar_filho(self.processarTerminal('PontV'))
+            no.adicionar_filho(self.variavel())
+        
+        return no
+    
+    def variavel(self):
+        # [VARIAVEL] ->[LISTA_ID] (:) [TIPO_DADO]
+
+        no = NoArvore('VARIAVEL')
+        
+        no.adicionar_filho(self.lista_id())
+        no.adicionar_filho(self.processarTerminal('DoisPt'))
+        no.adicionar_filho(self.tipo_dado())
+        
+        return no
+    
+    def lista_id(self):
+        """
+        Processa [LISTA_ID] -> [ID]] [LISTA_ID’]
+        e [LISTA_ID’] -> (,) [LISTA_ID] | Є de forma iterativa.
+        """
+        no = NoArvore('LISTA_ID')
+
+        no.adicionar_filho(self.processarTerminal('ID'))
+
+        while self.token_atual and self.token_atual.dado.token == 'Virg':
+            no.adicionar_filho(self.processarTerminal('Virg'))
+            no.adicionar_filho(self.processarTerminal('ID'))
         
         return no
 
