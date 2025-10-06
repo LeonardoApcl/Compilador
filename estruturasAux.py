@@ -51,3 +51,28 @@ class Lista:
         
         # 3. Junta todas as linhas com uma quebra de linha ("\n")
         return "\n".join(linhas_tabela)
+    
+class NoArvore:
+    def __init__(self, valor):
+        self.valor = valor
+        self.filhos = []
+
+    def adicionar_filho(self, no):
+        self.filhos.append(no)
+
+    def __str__(self, nivel=0):
+        # Representação visual da árvore 
+        prefixo = "  " * nivel
+        
+        # Verifica se o valor no nó é um objeto Token ou uma string
+        if isinstance(self.valor, Token):
+            # Se for um Token, imprime de forma mais detalhada
+            valor_str = f"Token({self.valor.token}, '{self.valor.lexema}')"
+        else:
+            # Se for uma string (como 'PROGRAMA'), apenas a exibe
+            valor_str = repr(self.valor)
+
+        ret = prefixo + valor_str + "\n"
+        for filho in self.filhos:
+            ret += filho.__str__(nivel + 1)
+        return ret

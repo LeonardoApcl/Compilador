@@ -1,6 +1,7 @@
 #Código criado para realizar testes na análise léxica
 
 from lex import Lexico
+from sint import Sintatico
 
 arquivos_teste = {
     "teste_basico.txt",
@@ -23,4 +24,17 @@ def executar():
         print("\n" + "="*50 + "\n")
 
 if __name__ == "__main__":
-    executar()
+    # executar()
+    print("Analise lexica!! \n")
+    analisadorLex = Lexico("teste_sint_comandos.txt")
+    lista_de_tokens = analisadorLex.analisar()
+
+    print(lista_de_tokens)
+    print("\n" + "="*50 + "\n")
+
+    print("Analise sintatica!! \n")
+    analisadorSint = Sintatico(lista_de_tokens)
+    arvore_sintatica = analisadorSint.analisar()
+
+    print(arvore_sintatica)
+    print("\n" + "="*50 + "\n")
