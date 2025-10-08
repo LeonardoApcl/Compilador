@@ -578,14 +578,13 @@ class Sintatico:
         # [NOME’] -> .[NOME] | ([) [PARAMETRO] (]) | Є
 
         no = NoArvore('NOME')
-        token_type = self.token_atual.dado.token if self.token_atual else None
-        if token_type == 'ID':
-            no.adicionar_filho(self.processarTerminal('ID'))
-               
-            while self.token_atual and self.token_atual.dado.token in FIRST['NOME_']:
-                if self.token_atual.dado.token == 'Pont':
-                    no.adicionar_filho(self.processarTerminal('Pont'))  
-                elif self.token_atual.dado.token == 'AColch':
-                    no.adicionar_filho(self.processarTerminal('AColch'))
+        no.adicionar_filho(self.processarTerminal('ID'))
+        
+        while self.token_atual and self.token_atual.dado.token in FIRST['NOME_']:
+            if self.token_atual.dado.token == 'Pont':
+                no.adicionar_filho(self.processarTerminal('Pont'))  
+            elif self.token_atual.dado.token == 'AColch':
+                no.adicionar_filho(self.processarTerminal('AColch'))
+                
         return no
             
