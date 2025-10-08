@@ -47,7 +47,7 @@ class Sintatico:
             'OP_LOGICO'   : {'OpLog'},
             'OP_MAT'      : {'OpMat'},
             'NOME'        : {'ID'},
-            'NOME_'       : {'AParent', 'AColch'},
+            'NOME_'       : {'Pont', 'AParent', 'AColch'},
         }
         
         self.FOLLOW = {

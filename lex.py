@@ -22,7 +22,7 @@ class Lexico:
             ';': 'PontV', '=': 'OpLog', '<': 'OpLog', '>': 'OpLog', '!': 'OpLog',
             '+': 'OpMat', '-': 'OpMat', '*': 'OpMat', '/': 'OpMat',
             '[': 'AColch', ']': 'FColch', ':': 'DoisPt', ',': 'Virg',
-            '(': 'AParent', ')': 'FParent', '\"': 'Aspas'
+            '(': 'AParent', ')': 'FParent', '\"': 'Aspas', '.': 'Pont'
         }
         self.simbolos_compostos = {':=': 'Atribuicao'}
     
