@@ -1,0 +1,19 @@
+#Testa acessos a campos de record e índices de array, que dependem do método nome() estar correto.#
+program TesteAcessos;
+
+type
+  tVetor := array [5] of integer;
+  tRegistro := record
+    vetor: tVetor;
+    id: integer
+  end;
+
+var
+  meuRegistro: tRegistro;
+
+begin
+  meuRegistro.id := 10;
+  meuRegistro.vetor[2] := 100;
+  
+  write meuRegistro.vetor[2]
+end

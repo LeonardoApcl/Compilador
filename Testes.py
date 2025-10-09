@@ -3,21 +3,23 @@
 from estruturasAux import visualizar_com_anytree
 from lex import Lexico
 from sint import Sintatico
-"""
-arquivos_teste = {
-    "teste_basico.txt",
-    "teste_completo.txt",
-    "teste_comentarios.txt",
-    "teste_com_erros.txt",
-    "teste_especial.txt",
-}"""
 
-arquivos_teste = {
-    "teste_sint_basico.txt"
+arquivos_teste_lexico = {
+    "Testes/Lexico/teste_basico.txt",
+    "Testes/Lexico/teste_completo.txt",
+    "Testes/Lexico/teste_comentarios.txt",
+    "Testes/Lexico/teste_com_erros.txt",
+    "Testes/Lexico/teste_especial.txt",
+}
+arquivos_teste_sintatico = {
+    "Testes/Sintatico/teste_acessos.txt",
+    "Testes/Sintatico/teste_declaracoes.txt",
+    "Testes/Sintatico/teste_estruturas_controle.txt",
+    "Testes/Sintatico/teste_sintaxe_invalida.txt",
 }
 
 def executar():
-    for nome_arquivo in arquivos_teste:
+    for nome_arquivo in arquivos_teste_sintatico:
         print(f">>> ANALISANDO ARQUIVO: {nome_arquivo} <<<\n")
         
         print("Analise lexica!! \n")

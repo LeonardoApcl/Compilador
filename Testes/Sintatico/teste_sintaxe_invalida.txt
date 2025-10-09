@@ -1,0 +1,17 @@
+#Contém erros sintáticos propositais para garantir que seu parser os identifique corretamente.#
+program ErrosSintaticos;
+
+var 
+  x, y: integer
+
+begin 
+  x := 10 + ; # Operador sem operando #
+  
+  if x > 5 # Falta 'then' #
+    write "maior";
+  
+  while x   # Falta condição lógica completa #
+  begin 
+  end;
+  
+end. # Ponto final não faz parte da regra #

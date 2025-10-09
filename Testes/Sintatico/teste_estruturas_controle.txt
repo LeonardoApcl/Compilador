@@ -1,0 +1,22 @@
+#Testa as estruturas de controle if/then/else e while.#
+program TesteControle;
+
+var
+  i: integer;
+  soma: integer;
+
+begin
+  i := 0;
+  soma := 0;
+  
+  while i < 10
+  begin
+    if i = 5 then
+      write "Metade do caminho"
+    else
+      soma := soma + i;
+    i := i + 1;
+  end;
+  
+  write "Fim"
+end

@@ -1,0 +1,30 @@
+#Testa todas as seções de declaração (const, type, var, function) em ordem e com diferentes combinações.#
+program TesteDeclaracoes;
+
+const
+  PI := 3.14159;
+  NOMEPROGRAMA := "Compilador";
+
+type
+  tVetor := array [10] of integer;
+  tRegistro := record
+    id: integer;
+    nome: tVetor # Exemplo de tipo aninhado#
+  end;
+
+var
+  idade, contador: integer;
+  salario: real;
+  meuVetor: tVetor;
+  aluno: tRegistro;
+
+function calcular(a: integer): real
+var
+  temp: real;
+begin
+  temp := a * a * PI;
+end
+
+begin
+  #Bloco principal vazio, apenas para validar a sintaxe.#
+end

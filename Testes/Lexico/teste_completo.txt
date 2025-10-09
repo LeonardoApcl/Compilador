@@ -2,7 +2,7 @@ program TesteCompleto;
 
 const
   PI := 3.14;
-  MAX_VALOR := 100;
+  MAXVALOR := 100;
 
 var
   contador: integer;
@@ -12,7 +12,7 @@ begin
   contador := 0;
   resultado := 0.0;
   
-  while contador < MAX_VALOR
+  while contador < MAXVALOR
   begin
     resultado := resultado + PI;
     contador := contador + 1;
