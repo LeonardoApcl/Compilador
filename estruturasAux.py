@@ -1,4 +1,5 @@
 from anytree import Node, RenderTree
+import graphviz
 
 class Token:
     def __init__(self, lexema, token, linha):
@@ -80,6 +81,7 @@ class NoArvore:
         return ret
     
 def visualizar_com_anytree(raiz_original):
+
     """
     Converte a árvore sintática (NoArvore) para uma árvore no formato da
     biblioteca anytree e a imprime no console.
@@ -113,3 +115,59 @@ def visualizar_com_anytree(raiz_original):
     # Usa o RenderTree para imprimir a árvore de forma bonita
     for pre, fill, node in RenderTree(raiz_anytree):
         print(f"{pre}{node.name}")
+
+def gerar_visualizacao_graphviz(raiz, nome_arquivo='arvore_sintatica'):
+    """
+    Percorre a árvore sintática e gera uma visualização usando Graphviz.
+    Salva o resultado em um arquivo .gv e renderiza uma imagem (ex: .png).
+    """
+    if not raiz:
+        print("Árvore está vazia.")
+        return
+
+    # Cria um novo grafo direcionado
+    dot = graphviz.Digraph(comment='Árvore Sintática', format='svg')
+    dot.attr('node', shape='ellipse', style='rounded')
+    dot.attr(rankdir='TB', size='8,5') # Top to Bottom layout
+
+    # Contador global para garantir IDs únicos para cada nó
+    node_counter = 0
+
+    def _adicionar_nos_e_arestas(no_atual):
+        """
+        Função auxiliar recursiva para percorrer a árvore e adicionar
+        nós e arestas (conexões) ao grafo do Graphviz.
+        """
+        nonlocal node_counter
+        id_no_atual = f'node_{node_counter}'
+        node_counter += 1
+
+        # Formata o rótulo do nó
+        if isinstance(no_atual.valor, Token):
+            # Para nós terminais (folhas), mostra o tipo e o lexema
+            label = f"{no_atual.valor.token}\n({no_atual.valor.lexema})"
+            dot.node(id_no_atual, label, shape='box') # Nós de token com formato diferente
+        else:
+            # Para nós não-terminais, mostra o nome da regra
+            label = str(no_atual.valor)
+            dot.node(id_no_atual, label)
+
+        # Para cada filho, adiciona o nó e a aresta que o conecta ao pai
+        for filho in no_atual.filhos:
+            id_filho = _adicionar_nos_e_arestas(filho)
+            dot.edge(id_no_atual, id_filho)
+        
+        return id_no_atual
+
+    # Inicia a recursão a partir da raiz
+    _adicionar_nos_e_arestas(raiz)
+    
+    # Renderiza o grafo
+    try:
+        dot.render(nome_arquivo, view=True, cleanup=True)
+        print(f"Árvore renderizada e salva como '{nome_arquivo}.svg'.")
+    except graphviz.backend.ExecutableNotFound:
+        print("\nERRO: O executável do Graphviz não foi encontrado.")
+        print("Verifique se o Graphviz está instalado e se o seu diretório 'bin' está no PATH do sistema.")
+        print(f"Arquivo DOT gerado: '{nome_arquivo}.gv'")
+        dot.save(nome_arquivo + '.gv')

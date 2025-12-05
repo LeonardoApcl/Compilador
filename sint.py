@@ -102,10 +102,12 @@ class Sintatico:
         else:
             print(f"Erro Sintatico: Esperado {esperado}, mas o arquivo terminou.")
 
-        print(f"  -> Iniciando recuperação de erro (sincronizando com FOLLOW('{NT}'))")
+        #Como o modo panico não estava funcionando 100%, deixamos no modo em que apenas mostra o erro
+        #Mais tarde devo tentar fazer o modo pânico funcionar
+        #print(f"  -> Iniciando recuperação de erro (sincronizando com FOLLOW('{NT}'))")
         
-        while self.token_atual is not None and self.token_atual.dado.token not in self.FOLLOW[NT]:
-            self.avancar()
+        #while self.token_atual is not None and self.token_atual.dado.token not in self.FOLLOW[NT]:
+            #self.avancar()
 
     def avancar(self):
         if self.token_atual:
