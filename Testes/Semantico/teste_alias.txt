@@ -1,0 +1,31 @@
+program TesteAlias;
+
+type
+    tIntBase := integer;
+    tIntApelido := tIntBase; # Alias de Alias #
+    
+    tArrBase := array [10] of tIntApelido;
+    tArrApelido := tArrBase; # Alias de Array #
+    
+    tRecBase := record
+        dado: tArrApelido;
+        valor: tIntApelido
+    end;
+    tRecApelido := tRecBase # Alias de Record #
+
+var
+    estrutura: tRecApelido; # Variavel usando o ultimo nivel de apelido #
+    numero: integer
+
+begin
+    # Teste 1: Atribuicao compativel (integer em tIntApelido) #
+    estrutura.valor := 100;
+    
+    # Teste 2: Acesso a array via alias (tArrApelido -> array) #
+    estrutura.dado[0] := 50;
+    
+    # Teste 3: Leitura reversa #
+    numero := estrutura.valor;
+    
+    write numero
+end

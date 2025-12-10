@@ -41,16 +41,22 @@ class CodigoIntermediario:
         self.CI(self.raiz)
         return self.instrucoes
 
-    # ---------- percorre em pós-ordem ----------
+    # ---------- percorre a árvore----------
     def CI(self, no):
         if no is None:
             return
 
-        # gerar para filhos primeiro
+        # CORREÇÃO: Se for um COMANDO, o próprio 'gerar_instrucao' gerencia a ordem
+        # de visitação dos filhos (para colocar labels e jumps no lugar certo).
+        if not self.is_token_node(no) and no.valor == "COMANDO":
+            self.gerar_instrucao(no)
+            return
+
+        # Para outros nós (Expressões, Listas, etc), mantém o Pós-Ordem padrão
         for f in no.filhos:
             self.CI(f)
 
-        # depois gerar para o nó atual
+        # depois gera a instrução para o nó atual
         self.gerar_instrucao(no)
 
     # ---------- geração por nó ----------
@@ -305,7 +311,7 @@ class CodigoIntermediario:
                             break
                 right_place = self.gerar_expr(right_node)
                 tmp = self.novo_temp()
-                instr = { "=": "eql", "<>": "dif", ">": "grt", "<": "les" }[op_lex]
+                instr = { "=": "eql", "!": "dif", ">": "grt", "<": "les" }[op_lex]
                 self.emit(f"{instr} {tmp} {left_place} {right_place}")
                 left_place = tmp
                 i += 2

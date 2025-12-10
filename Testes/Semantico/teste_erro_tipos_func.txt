@@ -1,0 +1,25 @@
+program ErrosFuncTipos;
+
+var
+    x: integer;
+    y: real
+
+function teste(a, b: integer): integer
+begin
+    # ERRO REGRA 7: Retorno espera integer, recebe real #
+    teste := 5.5
+end
+
+begin
+    x := 10;
+    y := 5.5;
+
+    # ERRO REGRA 3: Atribuicao integer := real #
+    x := y;
+
+    # ERRO REGRA 5: Numero errado de parametros #
+    x := teste(10);
+
+    # ERRO REGRA 6: Tipo errado de parametro (2o param espera int) #
+    x := teste(10, 5.5)
+end

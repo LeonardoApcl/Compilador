@@ -79,7 +79,7 @@ class NoArvore:
         for filho in self.filhos:
             ret += filho.__str__(nivel + 1)
         return ret
-    
+
 def visualizar_com_anytree(raiz_original):
 
     """
@@ -171,3 +171,19 @@ def gerar_visualizacao_graphviz(raiz, nome_arquivo='arvore_sintatica'):
         print("Verifique se o Graphviz está instalado e se o seu diretório 'bin' está no PATH do sistema.")
         print(f"Arquivo DOT gerado: '{nome_arquivo}.gv'")
         dot.save(nome_arquivo + '.gv')
+
+class Simbolo:
+    def __init__(self, nome, classificacao, tipo, escopo, Qtd=None, ordem=None, linha=0):
+        self.nome = nome                        # Ex: "fatorial", "x", "y" etc
+        self.classificacao = classificacao      # Ex: "funcao", "parametro", "variavel"
+        self.tipo = tipo                        # Ex: "integer", "real"
+        self.escopo = escopo                    # Ex: "global", "fatorial"
+        self.qtd = Qtd                          # Caso for uma variável terá o valor padrão, caso for uma função mostrará o número de parametros
+        self.ordem = ordem                      # Ex: 1 (1º param), 2 (2º param)
+        self.linha = linha                      # Função semelhante ao do token
+
+    def __str__(self):
+        s_qtd = str(self.qtd) if self.qtd is not None else "-"
+        s_ordem = str(self.ordem) + "º" if self.ordem is not None else "-"
+
+        return f"{self.nome:<15} | {self.classificacao:<15} | {self.tipo:<10} | {self.escopo:<15} | {s_qtd:<5} | {s_ordem}"

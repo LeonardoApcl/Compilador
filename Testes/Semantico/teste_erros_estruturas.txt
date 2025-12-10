@@ -1,0 +1,27 @@
+program ErrosEstruturas;
+
+type
+    tPonto := record
+        x, y: integer
+    end
+
+var
+    p: tPonto;
+    lista: array [10] of integer;
+    simples: integer
+
+begin
+    simples := 0;
+
+    # ERRO REGRA 8: 'simples' nao eh array #
+    simples[1] := 10;
+
+    # ERRO REGRA 9: 'simples' nao eh record #
+    simples.x := 10;
+
+    # ERRO REGRA 10: Campo 'z' nao existe no record tPonto #
+    p.z := 30;
+
+    # ERRO REGRA 8: Indice deve ser integer (passando real) #
+    lista[2.5] := 10
+end

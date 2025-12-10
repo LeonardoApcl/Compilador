@@ -1,0 +1,56 @@
+program Sucesso;
+
+const
+    LIMITE := 5
+
+type
+    tNota := integer;
+    tVetor := array [5] of tNota; # Testando Alias de Array #
+    
+    Aluno := record
+        id: integer;
+        notas: tVetor;
+        media: real
+    end
+
+var
+    joao: Aluno;
+    i, temp, soma: integer;
+    mediaCalc: real
+
+function calcularSoma(n: integer): integer
+var
+    res, ant, tempN: integer
+begin
+    if n < 1 then
+    begin
+        calcularSoma := 0
+    end
+    else
+    begin
+        # Gramatica sem parenteses: passo a passo #
+        tempN := n - 1;
+        ant := calcularSoma(tempN);
+        calcularSoma := n + ant
+    end
+end
+
+begin
+    joao.id := 1;
+    i := 0;
+    
+    # Preenche vetor #
+    while i < LIMITE
+    begin
+        joao.notas[i] := i * 10;
+        i := i + 1
+    end;
+
+    # Chama funcao recursiva #
+    soma := calcularSoma(4);
+    
+    # Atribuicao com coercao (int -> real) #
+    joao.media := soma;
+    
+    write joao.media
+end

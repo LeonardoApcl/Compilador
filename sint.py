@@ -5,8 +5,7 @@ class Sintatico:
         self.lista_tokens = lista_tokens
         self.token_atual = lista_tokens.cab if lista_tokens else None
 
-        # Conjuntos First de cada não-terminal
-
+        # --- DEFINIÇÃO DOS CONJUNTOS FIRST ---
         self.FIRST = {
             'PROGRAMA'    : {'Prog'},
             'CORPO'       : {'Const', 'Type', 'Var', 'Func', 'Begin'},
@@ -47,51 +46,12 @@ class Sintatico:
             'OP_LOGICO'   : {'OpLog'},
             'OP_MAT'      : {'OpMat'},
             'NOME'        : {'ID'},
-            'NOME_'       : {'Pont', 'AColch'},
+            'NOME_'       : {'Pont', 'AColch', 'AParent'},
         }
         
-        self.FOLLOW = {
-            'PROGRAMA'    : {'$'},
-            'CORPO'       : {'$'},
-            'DECLARACOES' : {'Begin'},
-            'DEF_CONST'   : {'Type', 'Var', 'Func', 'Begin'},
-            'LISTA_CONST' : {'Type', 'Var', 'Func', 'Begin'},
-            'LISTA_CONST_': {'Type', 'Var', 'Func', 'Begin'},
-            'CONSTANTE'   : {'PontV', 'Type', 'Var', 'Func', 'Begin'},
-            'CONST_VALOR' : {'PontV'},
-            'DEF_TIPOS'   : {'Var', 'Func', 'Begin'},
-            'LISTA_TIPOS' : {'Var', 'Func', 'Begin'},
-            'LISTA_TIPOS_': {'Var', 'Func', 'Begin'},
-            'TIPO'        : {'PontV', 'Var', 'Func', 'Begin'},
-            'TIPO_DADO'   : {'PontV', 'FParent', 'End'},
-            'DEF_VAR'     : {'Func', 'Begin', 'ID', 'Loop', 'Se', 'Escrita', 'Read'},
-            'LISTA_VAR'   : {'Func', 'Begin', 'End'},
-            'LISTA_VAR_'  : {'Func', 'Begin', 'End'},
-            'VARIAVEL'    : {'PontV', 'Func', 'Begin', 'End'},
-            'LISTA_ID'    : {'DoisPt'},
-            'LISTA_ID_'   : {'DoisPt'},
-            'LISTA_FUNC'  : {'Begin'},
-            'FUNCAO'      : {'Func', 'Begin'},
-            'NOME_FUNCAO' : {'Var', 'Begin', 'ID', 'Loop', 'Se', 'Escrita', 'Read'},
-            'BLOCO_FUNCAO': {'Func', 'Begin'},
-            'BLOCO'       : {'PontV', 'End', 'Senão', '$'},
-            'LISTA_COM'   : {'End'},
-            'COMANDO'     : {'PontV', 'End'},
-            'ELSE'        : {'PontV', 'End'},
-            'VALOR'       : {'PontV', 'End'},
-            'LISTA_PARAM' : {'PontV', 'OpMat', 'OpLog', 'FColch', 'FParent', 'Então', 'Begin', 'ID', 'Loop', 'Se', 'Escrita', 'Read', 'End'},
-            'LISTA_NOME'  : {'FParent'},
-            'LISTA_NOME_' : {'FParent'},
-            'EXP_LOGICA'  : {'Então', 'Begin', 'ID', 'Loop', 'Se', 'Escrita', 'Read'},
-            'EXP_LOGICA_' : {'Então', 'Begin', 'ID', 'Loop', 'Se', 'Escrita', 'Read'},
-            'EXP_MAT'     : {'OpLog', 'PontV', 'FColch', 'FParent', 'Então', 'Begin', 'ID', 'Loop', 'Se', 'Escrita', 'Read', 'End'},
-            'EXP_MAT_'    : {'OpLog', 'PontV', 'FColch', 'FParent', 'Então', 'Begin', 'ID', 'Loop', 'Se', 'Escrita', 'Read', 'End'},
-            'PARAMETRO'   : {'OpMat', 'OpLog', 'PontV', 'FColch', 'FParent', 'Então', 'Begin', 'ID', 'Loop', 'Se', 'Escrita', 'Read', 'End'},
-            'OP_LOGICO'   : {'ID', 'Num', 'AParent'},
-            'OP_MAT'      : {'ID', 'Num', 'AParent'},
-            'NOME'        : {'Atribuição', 'PontV', 'OpMat', 'OpLog', 'FColch', 'FParent', 'Então', 'Begin', 'ID', 'Loop', 'Se', 'Escrita', 'Read', 'End'},
-            'NOME_'       : {'Atribuição', 'PontV', 'OpMat', 'OpLog', 'FColch', 'FParent', 'Então', 'Begin', 'ID', 'Loop', 'Se', 'Escrita', 'Read', 'End'},
-        }
+        # O self.FOLLOW não precisa ser alterado para fazer o código funcionar,
+        # pois o analisador atual não implementa recuperação de erro (Modo Pânico).
+        self.FOLLOW = {} 
 
     def erro(self, esperado, NT):
         if self.token_atual:
@@ -102,64 +62,47 @@ class Sintatico:
         else:
             print(f"Erro Sintatico: Esperado {esperado}, mas o arquivo terminou.")
 
-        #Como o modo panico não estava funcionando 100%, deixamos no modo em que apenas mostra o erro
-        #Mais tarde devo tentar fazer o modo pânico funcionar
-        #print(f"  -> Iniciando recuperação de erro (sincronizando com FOLLOW('{NT}'))")
-        
-        #while self.token_atual is not None and self.token_atual.dado.token not in self.FOLLOW[NT]:
-            #self.avancar()
-
     def avancar(self):
         if self.token_atual:
             self.token_atual = self.token_atual.prox
 
-    def processarTerminal(self, token_esperado,NT):
+    def processarTerminal(self, token_esperado, NT):
         if self.token_atual and self.token_atual.dado.token == token_esperado:
             objeto_token = self.token_atual.dado
             no = NoArvore(objeto_token)
             self.avancar()
             return no
         else:
-            self.erro(token_esperado,NT)
+            self.erro(token_esperado, NT)
 
     def analisar(self):
         """ Ponto de entrada da análise sintática. """
         arvore = self.programa()
         if self.token_atual is not None:
-            print(f"Erro Sintatico: Tokens inesperados no final do arquivo.\n")
+            print(f"Erro Sintatico: Tokens inesperados no final do arquivo ({self.token_atual.dado.lexema}).\n")
         return arvore
     
-    #Métodos da gramática
+    # --- MÉTODOS DA GRAMÁTICA ---
 
     def programa(self):
-        # [PROGRAMA] -> (program) [ID] (;) [CORPO]
-
         no = NoArvore('PROGRAMA')
         no.adicionar_filho(self.processarTerminal('Prog','PROGRAMA'))
         no.adicionar_filho(self.processarTerminal('ID','PROGRAMA'))
         no.adicionar_filho(self.processarTerminal('PontV','PROGRAMA'))
         no.adicionar_filho(self.corpo())
-        
         return no
     
     def corpo(self):
-        # [CORPO] -> [DECLARACOES] (begin) [LISTA_COM] (end) | (begin) [LISTA_COM] (end)
-
         no = NoArvore('CORPO')
-        
         if self.token_atual and self.token_atual.dado.token in self.FIRST['DECLARACOES']:
             no.adicionar_filho(self.declaracoes())
         no.adicionar_filho(self.processarTerminal('Begin','CORPO'))
         no.adicionar_filho(self.lista_com())
         no.adicionar_filho(self.processarTerminal('End','CORPO'))
-        
         return no
 
     def declaracoes(self):
-        # [DECLARACOES] -> [DEF_CONST] [DEF_TIPOS] [DEF_VAR] [LISTA_FUNC] | Є
-
         no = NoArvore('DECLARACOES')
-        
         if self.token_atual and self.token_atual.dado.token in self.FIRST['DEF_CONST']:
             no.adicionar_filho(self.def_const())
         if self.token_atual and self.token_atual.dado.token in self.FIRST['DEF_TIPOS']:
@@ -168,136 +111,86 @@ class Sintatico:
             no.adicionar_filho(self.def_var())
         if self.token_atual and self.token_atual.dado.token in self.FIRST['LISTA_FUNC']:
             no.adicionar_filho(self.lista_func())
-        
         return no
     
     def def_const(self):
-        # [DEF_CONST] -> (const) [LISTA_CONST] | Є
-
         no = NoArvore('DEF_CONST')
-        
         if self.token_atual and self.token_atual.dado.token in self.FIRST['DEF_CONST']:
             no.adicionar_filho(self.processarTerminal('Const','DEF_CONST'))
             no.adicionar_filho(self.lista_const())
-        
         return no
     
     def lista_const(self):
-        """
-        Esse método não é exatamente como na gramática, foi percebido durante a implementação que
-        a forma sem o (;) leva a uma recursão (ou loop) infinito, de certa forma uma recursão a esquerda
-        indireta. Para evitar este problema o (;) foi retirado da gramática de constante e usado como
-        separador da lista de constantes (semelhante a lista de tipos).
-
-        Processa [LISTA_CONST] -> [CONSTANTE] [LISTA_CONST']
-        e [LISTA_CONST'] -> (;) [LISTA_CONST] | Є de forma iterativa.
-        """
         no = NoArvore('LISTA_CONST')
-
         no.adicionar_filho(self.constante())
-
         while self.token_atual and self.token_atual.dado.token == 'PontV':
             no.adicionar_filho(self.processarTerminal('PontV','LISTA_CONST'))
-            
             if self.token_atual and self.token_atual.dado.token in self.FIRST['CONSTANTE']:
                 no.adicionar_filho(self.constante())
             else:
                 break
-        
         return no
     
     def constante(self):
-        # [CONSTANTE] -> [ID] (:=) [CONST_VALOR]
-
         no = NoArvore('CONSTANTE')
-        
         no.adicionar_filho(self.processarTerminal('ID','CONSTANTE'))
         no.adicionar_filho(self.processarTerminal('Atribuicao','CONSTANTE'))
         no.adicionar_filho(self.const_valor())
-        
         return no
     
     def const_valor(self):
-        # [CONST_VALOR] -> (“) sequência alfanumérica (“) | [EXP_MATEMATICA]
-
         no = NoArvore('CONST_VALOR')
         token_type = self.token_atual.dado.token if self.token_atual else None
         
         if token_type == 'Aspas': 
             no.adicionar_filho(self.processarTerminal('Aspas','CONST_VALOR'))
-
-            # No léxico, a sequência alfanumérica é reconhecida como uma série de IDs e Nums
-            # Foi criado um pseudo não-terminal 'STRING_LITERAL' para agrupar essa sequência
             no_str = NoArvore('STRING_LITERAL')
             while self.token_atual and self.token_atual.dado.token != 'Aspas':
                 if self.token_atual.dado.token in ['ID', 'Num']:
                     no_str.adicionar_filho(NoArvore(self.token_atual.dado))
                     self.avancar()
                 else:
-                    self.erro("'ID', 'Num' ou 'Aspas' para fechar a string", 'CONST_VALOR')
+                    self.erro("'ID', 'Num' ou 'Aspas'", 'CONST_VALOR')
             no.adicionar_filho(no_str)
-            
             no.adicionar_filho(self.processarTerminal('Aspas','CONST_VALOR'))
         
         elif token_type in self.FIRST['EXP_MAT']:
             no.adicionar_filho(self.exp_mat())
-
         else:
-            self.erro(f"uma string(comecando por \") ou uma expressão matemática (comecando por ID, Num ou \'(\' )", 'CONST_VALOR')    
-        
+            self.erro(f"string ou expressao", 'CONST_VALOR')    
         return no
     
     def def_tipos(self):
-        # [DEF_TIPOS] -> (type) [LISTA_TIPOS] | Є
-
         no = NoArvore('DEF_TIPOS')
-        token_type = self.token_atual.dado.token if self.token_atual else None
-
-        if token_type == 'Type':
+        if self.token_atual and self.token_atual.dado.token == 'Type':
             no.adicionar_filho(self.processarTerminal('Type','DEF_TIPOS'))
             no.adicionar_filho(self.lista_tipos())
-        
         return no
     
     def lista_tipos(self):
-        """
-        Processa [LISTA_TIPOS] -> [TIPO] [LISTA_TIPOS’]
-        e [LISTA_TIPOS'] -> (;) [LISTA_TIPOS] | Є de forma iterativa.
-        """
         no = NoArvore('LISTA_TIPOS')
-
         no.adicionar_filho(self.tipo())
-
         while self.token_atual and self.token_atual.dado.token == 'PontV':
             no.adicionar_filho(self.processarTerminal('PontV','LISTA_TIPOS'))
-            
             if self.token_atual and self.token_atual.dado.token in self.FIRST['TIPO']:
                 no.adicionar_filho(self.tipo())
             else:
                 break
-        
         return no
     
     def tipo(self):
-        # [TIPO] -> [ID] (:=) [TIPO_DADO]
-
         no = NoArvore('TIPO')
-        
         no.adicionar_filho(self.processarTerminal('ID','TIPO'))
         no.adicionar_filho(self.processarTerminal('Atribuicao','TIPO'))
         no.adicionar_filho(self.tipo_dado())
-        
         return no
     
     def tipo_dado(self):
-        # [TIPO_DADO] -> (integer) | (real) | (array) ([) [NUMERO] (]) (of) [TIPO_DADO] | (record) [LISTA_VAR] (end) | [ID]
-
         no = NoArvore('TIPO_DADO')
         token_type = self.token_atual.dado.token if self.token_atual else None
         
         if token_type == 'TipoSimples': 
             no.adicionar_filho(self.processarTerminal('TipoSimples', 'TIPO_DADO'))
-        
         elif token_type == 'Array':
             no.adicionar_filho(self.processarTerminal('Array', 'TIPO_DADO'))
             no.adicionar_filho(self.processarTerminal('AColch', 'TIPO_DADO'))
@@ -305,125 +198,77 @@ class Sintatico:
             no.adicionar_filho(self.processarTerminal('FColch', 'TIPO_DADO'))
             no.adicionar_filho(self.processarTerminal('Of', 'TIPO_DADO'))
             no.adicionar_filho(self.tipo_dado())
-
         elif token_type == 'Record': 
             no.adicionar_filho(self.processarTerminal('Record', 'TIPO_DADO'))
             no.adicionar_filho(self.lista_var())
             no.adicionar_filho(self.processarTerminal('End', 'TIPO_DADO'))
-
         elif token_type == 'ID': 
             no.adicionar_filho(self.processarTerminal('ID', 'TIPO_DADO'))
-
         else:
-            self.erro(f"um tipo simples, 'array', 'record' ou ID", 'TIPO_DADO')
-        
+            self.erro(f"tipo simples, array, record ou ID", 'TIPO_DADO')
         return no
 
     def def_var(self):
-        # [DEF_VAR] -> (var) [LISTA_VAR] | Є
-
         no = NoArvore('DEF_VAR')
-        token_type = self.token_atual.dado.token if self.token_atual else None
-
-        if token_type == 'Var':
+        if self.token_atual and self.token_atual.dado.token == 'Var':
             no.adicionar_filho(self.processarTerminal('Var','DEF_VAR'))
             no.adicionar_filho(self.lista_var())
-        
         return no
     
     def lista_var(self):
-        """
-        Processa [LISTA_VAR] -> [VARIAVEL] [LISTA_VAR’]
-        e [LISTA_VAR’] -> (;) [LISTA_VAR] | Є de forma iterativa.
-        """
         no = NoArvore('LISTA_VAR')
-
         no.adicionar_filho(self.variavel())
-
         while self.token_atual and self.token_atual.dado.token == 'PontV':
             no.adicionar_filho(self.processarTerminal('PontV', 'LISTA_VAR'))
-            
             if self.token_atual and self.token_atual.dado.token in self.FIRST['VARIAVEL']:
                 no.adicionar_filho(self.variavel())
             else:
                 break
-        
         return no
     
     def variavel(self):
-        # [VARIAVEL] ->[LISTA_ID] (:) [TIPO_DADO]
-
         no = NoArvore('VARIAVEL')
-        
         no.adicionar_filho(self.lista_id())
         no.adicionar_filho(self.processarTerminal('DoisPt','VARIAVEL'))
         no.adicionar_filho(self.tipo_dado())
-        
         return no
     
     def lista_id(self):
-        """
-        Processa [LISTA_ID] -> [ID]] [LISTA_ID’]
-        e [LISTA_ID’] -> (,) [LISTA_ID] | Є de forma iterativa.
-        """
         no = NoArvore('LISTA_ID')
-
         no.adicionar_filho(self.processarTerminal('ID','LISTA_ID'))
-
         while self.token_atual and self.token_atual.dado.token == 'Virg':
             no.adicionar_filho(self.processarTerminal('Virg','LISTA_ID'))
-            
             if self.token_atual and self.token_atual.dado.token == 'ID':
                 no.adicionar_filho(self.processarTerminal('ID','LISTA_ID'))
             else:
                 break
-        
         return no
 
     def lista_com(self):
-        # Este método é iterativo
-        # [LISTA_COM] -> [COMANDO] (;) [LISTA_COM] | Є  
-
         no = NoArvore('LISTA_COM')
-        token_type = self.token_atual.dado.token if self.token_atual else None
-
-        if token_type in self.FIRST['COMANDO']:
+        if self.token_atual and self.token_atual.dado.token in self.FIRST['COMANDO']:
             no.adicionar_filho(self.comando())
-
             while self.token_atual and self.token_atual.dado.token == 'PontV':
                 no.adicionar_filho(self.processarTerminal('PontV','LISTA_COM'))
-                
                 if self.token_atual and self.token_atual.dado.token in self.FIRST['COMANDO']:
                     no.adicionar_filho(self.comando())
                 else:
                     break
-        
         return no
         
-        
     def lista_func(self):
-        # [LISTA_FUNC] -> [FUNCAO] [LISTA_FUNC] | Є
-        
         no = NoArvore('LISTA_FUNC')  
         while self.token_atual and self.token_atual.dado.token in self.FIRST['FUNCAO']:
             no.adicionar_filho(self.funcao())
-            
         return no
     
-    
     def funcao(self):
-        # [FUNCAO] -> [NOME_FUNCAO] [BLOCO_FUNCAO]
-        
         no = NoArvore('FUNCAO')
         no.adicionar_filho(self.nome_funcao())
         no.adicionar_filho(self.bloco_funcao())
-            
         return no
-        
     
     def nome_funcao(self):
-        # [NOME_FUNCAO] -> (function) [ID] (() [LISTA_VAR] ()) (:) [TIPO_DADO]
-        
         no = NoArvore('NOME_FUNCAO')
         no.adicionar_filho(self.processarTerminal('Func', 'NOME_FUNCAO'))
         no.adicionar_filho(self.processarTerminal('ID', 'NOME_FUNCAO'))
@@ -432,24 +277,17 @@ class Sintatico:
         no.adicionar_filho(self.processarTerminal('FParent', 'NOME_FUNCAO'))
         no.adicionar_filho(self.processarTerminal('DoisPt', 'NOME_FUNCAO'))
         no.adicionar_filho(self.tipo_dado())
-        
         return no
     
     def bloco_funcao(self):
-        # [BLOCO_FUNCAO] -> [DEF_VAR] [BLOCO] | [BLOCO]
-    
         no = NoArvore('BLOCO_FUNCAO')
         token_type = self.token_atual.dado.token if self.token_atual else None
-        
         if token_type == 'Var':
             no.adicionar_filho(self.def_var())
         no.adicionar_filho(self.bloco())
-        
         return no
     
     def bloco(self):
-        # [BLOCO] -> (begin) [LISTA_COM] (end) | [COMANDO]
-        
         no = NoArvore('BLOCO')
         token_type = self.token_atual.dado.token if self.token_atual else None
         if token_type in self.FIRST['BLOCO']:
@@ -460,13 +298,10 @@ class Sintatico:
             else:
                 no.adicionar_filho(self.comando())
         else:
-            self.erro(f"'begin', ID, 'while', 'if', 'write' ou 'read'", 'BLOCO')
-            
+            self.erro(f"'begin' ou comando", 'BLOCO')
         return no
     
     def comando(self):
-        # [COMANDO] -> [NOME] (:=) [VALOR] | (while) [EXP_LOGICA] [BLOCO] | (if) [EXP_LOGICA] (then) [BLOCO] [ELSE] | (write) [CONST_VALOR] | (read) [NOME]
-
         no = NoArvore('COMANDO')
         token_type = self.token_atual.dado.token if self.token_atual else None
         
@@ -474,148 +309,114 @@ class Sintatico:
             no.adicionar_filho(self.nome())
             no.adicionar_filho(self.processarTerminal('Atribuicao', 'COMANDO'))
             no.adicionar_filho(self.valor())
-    
         elif token_type == 'Loop':
             no.adicionar_filho(self.processarTerminal('Loop', 'COMANDO'))
             no.adicionar_filho(self.exp_logica())
             no.adicionar_filho(self.bloco())
-            
         elif token_type == 'Se':
             no.adicionar_filho(self.processarTerminal('Se', 'COMANDO'))
             no.adicionar_filho(self.exp_logica())
             no.adicionar_filho(self.processarTerminal('Entao', 'COMANDO'))
             no.adicionar_filho(self.bloco())
             no.adicionar_filho(self.senao()) #else
-            
         elif token_type == 'Escrita':
             no.adicionar_filho(self.processarTerminal('Escrita', 'COMANDO'))
             no.adicionar_filho(self.const_valor())
-            
         elif token_type == 'Leitura':
             no.adicionar_filho(self.processarTerminal('Leitura', 'COMANDO'))
             no.adicionar_filho(self.nome())
-            
         else:
-            self.erro(f"ID, 'while', 'if', 'write' ou 'read'", 'COMANDO')
-        
+            self.erro(f"Comando invalido", 'COMANDO')
         return no
         
     def senao(self):
-        # [ELSE] -> (else) [BLOCO] | Є
-        
         no = NoArvore('ELSE')
-        token_type = self.token_atual.dado.token if self.token_atual else None
-        
-        if token_type == 'Senao':
+        if self.token_atual and self.token_atual.dado.token == 'Senao':
             no.adicionar_filho(self.processarTerminal('Senao','ELSE'))
             no.adicionar_filho(self.bloco())
-            
         return no
     
     def valor(self):
-        # [VALOR] -> [EXP_MAT] | [ID] [LISTA_PARAM]
-        
+        # [VALOR] -> [EXP_MAT]
+        # Nota: Simplificado para chamar exp_mat direto, pois exp_mat agora cobre ID e Funções
         no = NoArvore('VALOR')
         token_type = self.token_atual.dado.token if self.token_atual else None
         
         if token_type in self.FIRST['EXP_MAT']:
             no.adicionar_filho(self.exp_mat())
-        elif token_type == 'ID':
-            no.adicionar_filho(self.processarTerminal('ID','VALOR'))
-            no.adicionar_filho(self.lista_param())
         else:
-            self.erro(f"ID, número ou '('", 'VALOR')
-        
+            self.erro(f"expressao", 'VALOR')
         return no
         
     def lista_param(self):
-        # [LISTA_PARAM] -> (() [LISTA_NOME] ())
-        
         no = NoArvore('LISTA_PARAM')
         no.adicionar_filho(self.processarTerminal('AParent','LISTA_PARAM'))   
         no.adicionar_filho(self.lista_nome())
         no.adicionar_filho(self.processarTerminal('FParent','LISTA_PARAM'))
-        
         return no
         
     def lista_nome(self):
-        # [LISTA_NOME]  -> [PARAMETRO] [LISTA_NOME’] | Є
-        # [LISTA_NOME’] -> (,) [LISTA_NOME]
-    
         no = NoArvore('LISTA_NOME')
         token_type = self.token_atual.dado.token if self.token_atual else None
-        if token_type in self.FIRST['PARAMETRO']:
-            no.adicionar_filho(self.parametro())
+        
+        # MUDANÇA: Aceita EXP_MAT (para argumentos como n-1)
+        if token_type in self.FIRST['EXP_MAT']:
+            no.adicionar_filho(self.exp_mat()) # Chama exp_mat em vez de parametro
 
             while self.token_atual and self.token_atual.dado.token == 'Virg':
                 no.adicionar_filho(self.processarTerminal('Virg','LISTA_NOME'))
-                
-                if self.token_atual and self.token_atual.dado.token in self.FIRST['PARAMETRO']:
-                    no.adicionar_filho(self.parametro())
+                if self.token_atual and self.token_atual.dado.token in self.FIRST['EXP_MAT']:
+                    no.adicionar_filho(self.exp_mat())
                 else:
-                    # Se não houver, a gramática foi violada.
-                    self.erro(f"um parâmetro válido após a vírgula {self.FIRST['PARAMETRO']}", 'LISTA_NOME')
-        
+                    self.erro(f"argumento valido", 'LISTA_NOME')
         return no
     
     def exp_logica(self):
-        # [EXP_LOGICA]  -> [EXP_MAT] [EXP_LOGICA’]
-        # [EXP_LOGICA’] -> [OP_LOGICO] [EXP_LOGICA] | Є
-    
         no = NoArvore('EXP_LOGICA')
         no.adicionar_filho(self.exp_mat())
-        
         while self.token_atual and self.token_atual.dado.token == 'OpLog':
             no.adicionar_filho(self.op_logico())
             no.adicionar_filho(self.exp_mat())
-                
         return no
         
     def exp_mat(self):
-        # [EXP_MAT]  -> [PARAMETRO] [EXP_MAT’]
-        # [EXP_MAT’] -> [OP_ MAT] [EXP_ MAT] | Є
-    
         no = NoArvore('EXP_MAT')
         no.adicionar_filho(self.parametro())
-        
         while self.token_atual and self.token_atual.dado.token == 'OpMat':
                 no.adicionar_filho(self.op_mat())
                 no.adicionar_filho(self.parametro())
-                
         return no
         
     def parametro(self):
-        # [PARAMETRO] - > [NOME] | [NUMERO]
+        # [PARAMETRO] -> [NOME] | [NUMERO] | ( [EXP_MAT] )
         no = NoArvore('PARAMETRO')
         token_type = self.token_atual.dado.token if self.token_atual else None
         
-        if token_type in self.FIRST['NOME']:
+        if token_type == 'AParent': # MUDANÇA: Suporte a parenteses (a+b)
+            no.adicionar_filho(self.processarTerminal('AParent', 'PARAMETRO'))
+            no.adicionar_filho(self.exp_mat())
+            no.adicionar_filho(self.processarTerminal('FParent', 'PARAMETRO'))
+        elif token_type in self.FIRST['NOME']:
             no.adicionar_filho(self.nome())
         elif token_type == 'Num':
             no.adicionar_filho(self.processarTerminal('Num','PARAMETRO'))
         else:
-            self.erro(f"ID ou um número", 'PARAMETRO')
-          
+            self.erro(f"ID, numero ou '('", 'PARAMETRO')
         return no
         
     def op_logico(self):
-        # [OP_LOGICO] -> (>) | (<) | (=) | (!)
         no = NoArvore('OP_LOGICO')
         no.adicionar_filho(self.processarTerminal('OpLog','OP_LOGICO'))
-        
         return no
         
     def op_mat(self):
-        # [OP_MAT] -> (+) | (-) | (*) | (/)
         no = NoArvore('OP_MAT')
         no.adicionar_filho(self.processarTerminal('OpMat','OP_MAT'))
-    
         return no
         
     def nome(self):
         # [NOME]  -> [ID] [NOME’]
-        # [NOME’] -> .[NOME] | ([) [PARAMETRO] (]) | Є
-
+        # [NOME’] -> .[NOME] | ([) [PARAMETRO] (]) | ( [LISTA_PARAM] ) | Є
         no = NoArvore('NOME')
         no.adicionar_filho(self.processarTerminal('ID','NOME'))
         
@@ -632,6 +433,8 @@ class Sintatico:
                 no_nome_linha.adicionar_filho(self.parametro())
                 no_nome_linha.adicionar_filho(self.processarTerminal('FColch','NOME'))
                 no.adicionar_filho(no_nome_linha)
+            elif token_type == 'AParent': # MUDANÇA: Suporte a chamada de função f()
+                no_nome_linha.adicionar_filho(self.lista_param())
+                no.adicionar_filho(no_nome_linha)
                 
         return no
-            
