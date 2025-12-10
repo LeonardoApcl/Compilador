@@ -17,11 +17,12 @@ arquivos_teste_lexico = {
 arquivos_teste_sintatico = {
     #"Testes/Sintatico/teste_acessos.txt",
     #"Testes/Sintatico/teste_declaracoes.txt",
-    #"Testes/Sintatico/teste_estruturas_controle.txt",
-    "Testes/Sintatico/teste_sintaxe_invalida.txt",
+    "Testes/Sintatico/teste_estruturas_controle.txt",
+    #"Testes/Sintatico/teste_sintaxe_invalida.txt",
 }
 arquivos_teste_semantico = {
     "Testes/Semantico/teste_sucesso_completo.txt",
+    #"Testes/Semantico/teste_semantico_interme.txt",
     #"Testes/Semantico/teste_alias.txt",
     #"Testes/Semantico/teste_erros_estruturas.txt",
     #"Testes/Semantico/teste_erro_tipos_func.txt",
@@ -60,28 +61,25 @@ def executar():
         print("\n" + "="*50 + "\n")
         
         print("Geração de Cod. intermediário !! \n")
-        try:
-            gerador = CodigoIntermediario(arvore_sintatica)
-            instrucoes = gerador.gerar()
 
-            print("Lista de Instruções Gerada:")
-            print("-" * 30)
-            for i, instr in enumerate(instrucoes):
-                print(f"{i}: {instr}")
-            print("-" * 30)
-        
-        except Exception as e:
-            print(f"Erro na geração de código: {e}")
+        gerador = CodigoIntermediario(arvore_sintatica)
+        instrucoes = gerador.gerar()
+
+        print("Lista de Instruções Gerada:")
+        print("-" * 30)
+        for i, instr in enumerate(instrucoes):
+            print(f"{i}: {instr}")
+        print("-" * 30)
         
         print("\n" + "="*50 + "\n")
 
-        """try:
+        try:
             gerar_visualizacao_graphviz(arvore_sintatica, 'arvore_simples')
         
         except SyntaxError as e:
             print(e)
         except Exception as e:
-            print(f"Ocorreu um erro inesperado: {e}")"""
+            print(f"Ocorreu um erro inesperado: {e}")
 
 if __name__ == "__main__":
     executar()

@@ -1,0 +1,58 @@
+program CalculadoraInterativa;
+
+const
+    FATOR := 2
+
+var
+    entrada, i: integer;
+    resultado: integer
+
+# Funcao auxiliar que dobra o valor #
+function dobrar(valor: integer): integer
+begin
+    dobrar := valor * FATOR
+end
+
+# Funcao principal que processa a logica #
+function processar(n: integer): integer
+var
+    temp, acumulador: integer
+begin
+    acumulador := 0;
+    temp := 0;
+    
+    # Loop com condicao composta simulada #
+    while n > 0
+    begin
+        if n > 5 then
+        begin
+            # Chama outra funcao #
+            temp := dobrar(n);
+            acumulador := acumulador + temp
+        end
+        else
+        begin
+            acumulador := acumulador + n
+        end;
+
+        n := n - 1
+    end;
+
+    processar := acumulador
+end
+
+begin
+    write "Digite um numero positivo";
+    read entrada;
+    
+    if entrada < 0 then
+    begin
+        write "Erro Numero negativo"
+    end
+    else
+    begin
+        resultado := processar(entrada);
+        write "Resultado do processamento";
+        write resultado
+    end
+end
