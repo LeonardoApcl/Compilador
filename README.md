@@ -1,4 +1,4 @@
 # Compilador
-Um compilador para uma gramática fictícia criado para disciplina de compiladores, a gramática e as descrições dos tokens está presente no documento PDF "DescricaoGRA_tokens"
-* OBS : atualmente o projeto pode utilizar o ply para gerar os analizadores léxicos e sintáticos
-* OBS2 : Também foi utilizado o anytree para visualização da árvore sintática
+Um compilador para uma gramática fictícia (um Pascal simplificado) criado para disciplina de compiladores, a gramática e as descrições dos tokens está presente no documento PDF "DescricaoGRA_tokens"
+
+* OBS : Para geração visual da arvore sintática, estamos usando anytree (visão no terminal) e graphviz (gera um svg da arvore )
